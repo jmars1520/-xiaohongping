@@ -166,9 +166,9 @@ export default function OrderCreate({ onBack, onRequireLogin }: OrderCreateProps
               <div className="mt-4 bg-red-50 rounded-xl p-4">
                 <div className="text-sm text-gray-600">回收预估价格</div>
                 <div className="text-2xl font-bold text-red-500 mt-1">
-                  ¥{(Number(simpleCount) * 5).toLocaleString()}
+                  ¥{(Number(simpleCount) * 3).toLocaleString()} - ¥{(Number(simpleCount) * 8).toLocaleString()}
                 </div>
-                <div className="text-xs text-gray-400 mt-1">{simpleCount}具 × 4kg回收价格（5元/具）</div>
+                <div className="text-xs text-gray-400 mt-1">{simpleCount}具 × 4kg回收价格（3~8元/具）</div>
               </div>
             )}
           </div>
