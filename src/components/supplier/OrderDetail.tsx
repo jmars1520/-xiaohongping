@@ -5,19 +5,17 @@ interface OrderDetailProps {
   onBack: () => void;
 }
 
-const specDetails = [
-  { type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "过期", qty: 50, price: 5, total: 250 },
-  { type: "干粉灭火器", form: "推车式", weight: "35kg", condition: "完好", qty: 10, price: 25, total: 250 },
-  { type: "CO₂灭火器", form: "手提式", weight: "3kg", condition: "过期", qty: 40, price: 8, total: 320 },
-  { type: "水基灭火器", form: "手提式", weight: "2kg", condition: "锈蚀", qty: 20, price: 3, total: 60 },
-];
+const orderData = {
+  totalQty: 120,
+  estimatedPrice: 600, // 120具 × 5元/具
+  confirmedPrice: 880, // 后台确认后的价格
+  isPriceConfirmed: false, // 后台是否已确认价格
+};
 
 export default function OrderDetail({ onBack }: OrderDetailProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
-
-  const grandTotal = specDetails.reduce((sum, s) => sum + s.total, 0);
-  const totalQty = specDetails.reduce((sum, s) => sum + s.qty, 0);
+  const isPriceConfirmed = confirmed || orderData.isPriceConfirmed;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -30,24 +28,24 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
       </div>
 
       {/* Status Banner */}
-      {!confirmed ? (
-        <div className="mx-4 mt-4 bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
-            <Clock size={20} className="text-orange-500" />
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-orange-700">待确认价格</div>
-            <div className="text-xs text-orange-500 mt-0.5">集货商已提交成交价格，请确认</div>
-          </div>
-        </div>
-      ) : (
+      {isPriceConfirmed ? (
         <div className="mx-4 mt-4 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3">
           <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
             <CheckCircle2 size={20} className="text-green-500" />
           </div>
           <div>
             <div className="text-sm font-semibold text-green-700">价格已确认</div>
-            <div className="text-xs text-green-500 mt-0.5">货款已支付，等待集货商送至拆解厂</div>
+            <div className="text-xs text-green-500 mt-0.5">后台已确认订单价格，货款已支付</div>
+          </div>
+        </div>
+      ) : (
+        <div className="mx-4 mt-4 bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
+            <Clock size={20} className="text-orange-500" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-orange-700">待客服定价</div>
+            <div className="text-xs text-orange-500 mt-0.5">集货商已提交完整清单，等待后台客服定价</div>
           </div>
         </div>
       )}
@@ -82,35 +80,26 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
         </div>
       </div>
 
-      {/* Spec Details */}
+      {/* Price Info */}
       <div className="mx-4 mt-4 bg-white rounded-2xl p-4 shadow-sm">
-        <div className="text-sm font-semibold text-gray-700 mb-3">多规格分项明细</div>
+        <div className="text-sm font-semibold text-gray-700 mb-3">价格信息</div>
         <div className="space-y-3">
-          {specDetails.map((spec, idx) => (
-            <div key={idx} className="bg-gray-50 rounded-xl p-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-gray-800">{spec.type}</span>
-                <span className="text-sm font-bold text-red-500">¥{spec.total}</span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs bg-white px-2 py-0.5 rounded text-gray-500">{spec.form}</span>
-                <span className="text-xs bg-white px-2 py-0.5 rounded text-gray-500">{spec.weight}</span>
-                <span className="text-xs bg-white px-2 py-0.5 rounded text-gray-500">{spec.condition}</span>
-              </div>
-              <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                <span>{spec.qty}具 × ¥{spec.price}/具</span>
-                <span>单项总价 ¥{spec.total}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Grand Total */}
-        <div className="mt-4 pt-3 border-t border-gray-100">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600">合计 {totalQty} 具</span>
-            <span className="text-xl font-bold text-red-500">¥{grandTotal.toLocaleString()}</span>
+            <span className="text-sm text-gray-500">总数量</span>
+            <span className="text-sm font-bold text-gray-800">{orderData.totalQty} 具</span>
           </div>
+          {isPriceConfirmed ? (
+            <div className="bg-green-50 rounded-xl p-4">
+              <div className="text-xs text-green-600 mb-1">订单总金额（后台已确认）</div>
+              <div className="text-2xl font-bold text-green-600">¥{orderData.confirmedPrice.toLocaleString()}</div>
+            </div>
+          ) : (
+            <div className="bg-orange-50 rounded-xl p-4">
+              <div className="text-xs text-orange-600 mb-1">订单预估价格</div>
+              <div className="text-2xl font-bold text-orange-500">¥{orderData.estimatedPrice.toLocaleString()}</div>
+              <div className="text-xs text-gray-400 mt-1">按4kg干粉灭火器 × {orderData.totalQty}具 × 5元/具 估算，最终价格以后台确认为准</div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -134,16 +123,24 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
       </div>
 
       {/* Action Buttons */}
-      {!confirmed && (
+      {isPriceConfirmed && !confirmed && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 flex gap-3">
           <button className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-medium text-sm">
-            拒绝并申请客服介入
+            申请客服介入
           </button>
           <button
             onClick={() => setShowConfirmModal(true)}
             className="flex-1 bg-red-500 text-white py-3 rounded-xl font-medium text-sm"
           >
-            确认价格
+            同意并确认
+          </button>
+        </div>
+      )}
+
+      {!isPriceConfirmed && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4">
+          <button className="w-full border border-gray-300 text-gray-600 py-3 rounded-xl font-medium text-sm">
+            取消订单
           </button>
         </div>
       )}
@@ -152,9 +149,9 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-8">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
-            <h3 className="font-bold text-gray-800 text-center mb-2">确认成交价格</h3>
-            <p className="text-sm text-gray-500 text-center mb-2">确认后平台将实时支付货款至您的账户</p>
-            <div className="text-center text-3xl font-bold text-red-500 my-4">¥{grandTotal.toLocaleString()}</div>
+            <h3 className="font-bold text-gray-800 text-center mb-2">确认订单金额</h3>
+            <p className="text-sm text-gray-500 text-center mb-2">后台已确认订单价格，确认后平台将支付货款</p>
+            <div className="text-center text-3xl font-bold text-red-500 my-4">¥{orderData.confirmedPrice.toLocaleString()}</div>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowConfirmModal(false)}
@@ -166,7 +163,7 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
                 onClick={() => { setShowConfirmModal(false); setConfirmed(true); }}
                 className="flex-1 bg-red-500 text-white py-2.5 rounded-xl text-sm font-medium"
               >
-                确认支付
+                确认同意
               </button>
             </div>
           </div>

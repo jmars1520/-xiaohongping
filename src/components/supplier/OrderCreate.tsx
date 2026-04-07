@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, Trash2, AlertTriangle, MapPin, Calendar, ChevronDown, Phone, MessageSquare } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, AlertTriangle, MapPin, Calendar, ChevronDown, Phone, MessageSquare, LocateFixed } from "lucide-react";
 
 interface OrderCreateProps {
   onBack: () => void;
@@ -163,10 +163,11 @@ export default function OrderCreate({ onBack, onRequireLogin }: OrderCreateProps
             />
             {Number(simpleCount) > 0 && (
               <div className="mt-4 bg-red-50 rounded-xl p-4">
-                <div className="text-sm text-gray-600">预估总价区间</div>
+                <div className="text-sm text-gray-600">预估回收价格</div>
                 <div className="text-2xl font-bold text-red-500 mt-1">
-                  ¥{(Number(simpleCount) * 3).toLocaleString()} - ¥{(Number(simpleCount) * 8).toLocaleString()}
+                  ¥{(Number(simpleCount) * 5).toLocaleString()}
                 </div>
+                <div className="text-xs text-gray-400 mt-1">按4kg干粉灭火器 × {simpleCount}具 × 5元/具 估算</div>
               </div>
             )}
           </div>
@@ -281,10 +282,16 @@ export default function OrderCreate({ onBack, onRequireLogin }: OrderCreateProps
       {/* Address & Time */}
       <div className="mx-4 mt-4 bg-white rounded-2xl p-4 shadow-sm space-y-4">
         <div>
-          <label className="text-sm font-semibold text-gray-700 flex items-center gap-1 mb-2">
-            <MapPin size={14} className="text-red-500" />
-            回收地址
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+              <MapPin size={14} className="text-red-500" />
+              回收地址
+            </label>
+            <button className="flex items-center gap-1 text-xs text-red-500 font-medium bg-red-50 px-2.5 py-1.5 rounded-lg active:bg-red-100 transition">
+              <LocateFixed size={14} />
+              获取当前位置
+            </button>
+          </div>
           {/* Province / City / District */}
           <div className="grid grid-cols-3 gap-2 mb-3">
             <div className="relative">

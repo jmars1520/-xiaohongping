@@ -6,14 +6,13 @@ interface MyTasksProps {
   onBack: () => void;
 }
 
-interface PriceItem {
+interface ProductItem {
   id: number;
   type: string;
   form: string;
   weight: string;
   condition: string;
   qty: number;
-  unitPrice: number;
 }
 
 const fireTypes = ["干粉灭火器", "CO₂灭火器", "水基灭火器", "泡沫灭火器"];
@@ -22,75 +21,76 @@ const weights = ["1kg", "2kg", "3kg", "4kg", "5kg", "8kg", "35kg", "50kg"];
 const conditions = ["完好", "过期", "损坏", "锈蚀"];
 
 const mockTasks = [
-  { id: "HY20260401001", status: "进行中", address: "朝阳区建国路88号", count: 120, isMultiSpec: true },
-  { id: "HY20260330008", status: "待确认", address: "丰台区南三环西路16号", count: 85, isMultiSpec: false },
-  { id: "HY20260325003", status: "已完成", address: "西城区金融大街19号", count: 200, isMultiSpec: true },
+  { id: "HY20260401001", status: "进行中", address: "朝阳区建国路88号", count: 120, isMultiSpec: true, estimatedPrice: 600 },
+  { id: "HY20260330008", status: "待确认", address: "丰台区南三环西路16号", count: 85, isMultiSpec: false, estimatedPrice: 425 },
+  { id: "HY20260325003", status: "已完成", address: "西城区金融大街19号", count: 200, isMultiSpec: true, estimatedPrice: 1000, confirmedPrice: 880 },
 ];
 
 export default function MyTasks({ onBack }: MyTasksProps) {
   const [activeTab, setActiveTab] = useState("进行中");
-  const [showPriceForm, setShowPriceForm] = useState(false);
-  const [priceItems, setPriceItems] = useState<PriceItem[]>([
-    { id: 1, type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "过期", qty: 50, unitPrice: 5 },
-    { id: 2, type: "干粉灭火器", form: "推车式", weight: "35kg", condition: "完好", qty: 10, unitPrice: 25 },
-    { id: 3, type: "CO₂灭火器", form: "手提式", weight: "3kg", condition: "过期", qty: 40, unitPrice: 8 },
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [productItems, setProductItems] = useState<ProductItem[]>([
+    { id: 1, type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "过期", qty: 50 },
+    { id: 2, type: "干粉灭火器", form: "推车式", weight: "35kg", condition: "完好", qty: 10 },
+    { id: 3, type: "CO₂灭火器", form: "手提式", weight: "3kg", condition: "过期", qty: 40 },
   ]);
   const [submitted, setSubmitted] = useState(false);
-  const [finalPrice, setFinalPrice] = useState<string>("");
-  const [priceRemark, setPriceRemark] = useState("");
+  const [productRemark, setProductRemark] = useState("");
 
   const tabs = ["进行中", "待确认", "已完成"];
   const filteredTasks = mockTasks.filter((t) => t.status === activeTab);
 
-  const addPriceItem = () => {
-    setPriceItems([
-      ...priceItems,
-      { id: Date.now(), type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "完好", qty: 1, unitPrice: 5 },
+  const addProductItem = () => {
+    setProductItems([
+      ...productItems,
+      { id: Date.now(), type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "完好", qty: 1 },
     ]);
   };
 
-  const removePriceItem = (id: number) => {
-    if (priceItems.length > 1) {
-      setPriceItems(priceItems.filter((item) => item.id !== id));
+  const removeProductItem = (id: number) => {
+    if (productItems.length > 1) {
+      setProductItems(productItems.filter((item) => item.id !== id));
     }
   };
 
-  const updatePriceItem = (id: number, field: keyof PriceItem, value: string | number) => {
-    setPriceItems(priceItems.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
+  const updateProductItem = (id: number, field: keyof ProductItem, value: string | number) => {
+    setProductItems(productItems.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
   };
 
-  const grandTotal = priceItems.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);
-  const totalQty = priceItems.reduce((sum, item) => sum + item.qty, 0);
+  const totalQty = productItems.reduce((sum, item) => sum + item.qty, 0);
+  const estimatedPrice = totalQty * 5;
 
-  if (showPriceForm) {
+  if (showProductForm) {
     return (
       <div className="min-h-screen bg-gray-50 pb-24">
         <div className="bg-white sticky top-0 z-40 px-4 py-3 flex items-center gap-3 border-b border-gray-100">
-          <button onClick={() => setShowPriceForm(false)} className="p-1">
+          <button onClick={() => setShowProductForm(false)} className="p-1">
             <ArrowLeft size={20} className="text-gray-600" />
           </button>
-          <h1 className="text-lg font-semibold">提交成交价格</h1>
+          <h1 className="text-lg font-semibold">提交完整清单</h1>
         </div>
 
-        {/* Original Order Info */}
+        {/* Order Estimated Price */}
         <div className="mx-4 mt-4 bg-blue-50 rounded-2xl p-4">
-          <div className="text-sm font-semibold text-blue-700 mb-2">货源方原始清单</div>
-          <div className="text-xs text-blue-600 space-y-1">
-            <div>干粉灭火器 · 手提式 · 4kg · 过期 × 50具</div>
-            <div>干粉灭火器 · 推车式 · 35kg · 完好 × 10具</div>
-            <div>CO₂灭火器 · 手提式 · 3kg · 过期 × 40具</div>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-semibold text-blue-700">订单预估价格</div>
+              <div className="text-xs text-blue-500 mt-0.5">按4kg干粉灭火器 × 5元/具 估算</div>
+            </div>
+            <div className="text-xl font-bold text-blue-600">¥{estimatedPrice.toLocaleString()}</div>
           </div>
+          <div className="text-xs text-gray-400 mt-2">最终价格由后台客服确认后生效</div>
         </div>
 
-        {/* Price Items */}
+        {/* Product Items */}
         <div className="mx-4 mt-4 space-y-3">
-          <div className="text-sm font-semibold text-gray-700">多规格分项报价</div>
-          {priceItems.map((item, index) => (
+          <div className="text-sm font-semibold text-gray-700">现场实际商品信息</div>
+          {productItems.map((item, index) => (
             <div key={item.id} className="bg-white rounded-2xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-semibold text-gray-700">规格 {index + 1}</span>
-                {priceItems.length > 1 && (
-                  <button onClick={() => removePriceItem(item.id)} className="text-gray-400 p-1">
+                {productItems.length > 1 && (
+                  <button onClick={() => removeProductItem(item.id)} className="text-gray-400 p-1">
                     <Trash2 size={16} />
                   </button>
                 )}
@@ -102,7 +102,7 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                   <div className="relative">
                     <select
                       value={item.type}
-                      onChange={(e) => updatePriceItem(item.id, "type", e.target.value)}
+                      onChange={(e) => updateProductItem(item.id, "type", e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                       {fireTypes.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -115,7 +115,7 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                   <div className="relative">
                     <select
                       value={item.form}
-                      onChange={(e) => updatePriceItem(item.id, "form", e.target.value)}
+                      onChange={(e) => updateProductItem(item.id, "form", e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                       {forms.map((f) => <option key={f} value={f}>{f}</option>)}
@@ -128,7 +128,7 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                   <div className="relative">
                     <select
                       value={item.weight}
-                      onChange={(e) => updatePriceItem(item.id, "weight", e.target.value)}
+                      onChange={(e) => updateProductItem(item.id, "weight", e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                       {weights.map((w) => <option key={w} value={w}>{w}</option>)}
@@ -141,7 +141,7 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                   <div className="relative">
                     <select
                       value={item.condition}
-                      onChange={(e) => updatePriceItem(item.id, "condition", e.target.value)}
+                      onChange={(e) => updateProductItem(item.id, "condition", e.target.value)}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs appearance-none bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
                       {conditions.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -151,37 +151,21 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">实际数量</label>
-                  <input
-                    type="number"
-                    value={item.qty}
-                    onChange={(e) => updatePriceItem(item.id, "qty", Number(e.target.value))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    min={1}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">协商单价(元)</label>
-                  <input
-                    type="number"
-                    value={item.unitPrice}
-                    onChange={(e) => updatePriceItem(item.id, "unitPrice", Number(e.target.value))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    min={0}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-2 text-right text-xs text-gray-500">
-                单项总价：<span className="text-blue-600 font-bold">¥{(item.qty * item.unitPrice).toLocaleString()}</span>
+              <div className="mt-2">
+                <label className="text-xs text-gray-500 mb-1 block">实际数量（具）</label>
+                <input
+                  type="number"
+                  value={item.qty}
+                  onChange={(e) => updateProductItem(item.id, "qty", Number(e.target.value))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  min={1}
+                />
               </div>
             </div>
           ))}
 
           <button
-            onClick={addPriceItem}
+            onClick={addProductItem}
             className="w-full border-2 border-dashed border-gray-300 rounded-2xl py-3 flex items-center justify-center gap-2 text-gray-500 text-sm hover:border-blue-300 hover:text-blue-500 transition"
           >
             <Plus size={16} />
@@ -195,23 +179,10 @@ export default function MyTasks({ onBack }: MyTasksProps) {
               <span className="font-bold text-gray-800">{totalQty} 具</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">整体成交总价</span>
-              <span className="text-xl font-bold text-blue-600">¥{grandTotal.toLocaleString()}</span>
+              <span className="text-gray-600">订单预估价格</span>
+              <span className="text-lg font-bold text-blue-600">¥{estimatedPrice.toLocaleString()}</span>
             </div>
-            <div className="border-t border-blue-200 pt-3 mt-2">
-              <label className="text-sm font-semibold text-blue-700 mb-2 block">最终确认回收总价格（元）</label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 font-bold text-sm">¥</span>
-                <input
-                  type="number"
-                  value={finalPrice}
-                  onChange={(e) => setFinalPrice(e.target.value)}
-                  placeholder="请输入最终确认的回收总价格"
-                  className="w-full border-2 border-blue-300 rounded-xl pl-8 pr-4 py-3 text-lg font-bold text-blue-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-sm placeholder:font-normal placeholder:text-gray-400"
-                  min={0}
-                />
-              </div>
-            </div>
+            <div className="text-xs text-gray-400">最终价格由后台客服定价确认</div>
           </div>
 
           {/* Remarks */}
@@ -221,8 +192,8 @@ export default function MyTasks({ onBack }: MyTasksProps) {
               备注
             </label>
             <textarea
-              value={priceRemark}
-              onChange={(e) => setPriceRemark(e.target.value)}
+              value={productRemark}
+              onChange={(e) => setProductRemark(e.target.value)}
               placeholder="请输入备注信息（如现场情况说明、特殊事项等）"
               rows={3}
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
@@ -237,11 +208,11 @@ export default function MyTasks({ onBack }: MyTasksProps) {
               onClick={() => setSubmitted(true)}
               className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-base shadow-lg active:bg-blue-700 transition"
             >
-              提交报价
+              提交完整清单
             </button>
           ) : (
             <div className="text-center text-sm text-green-600 font-medium py-3">
-              报价已提交，等待货源方确认
+              清单已提交，等待后台客服定价
             </div>
           )}
         </div>
@@ -285,10 +256,25 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                 {task.isMultiSpec && <StatusBadge status="多规格" />}
               </div>
             </div>
-            <div className="flex items-center gap-1.5 mb-3">
+            <div className="flex items-center gap-1.5 mb-2">
               <MapPin size={14} className="text-gray-400" />
               <span className="text-sm text-gray-600">{task.address}</span>
               <span className="text-xs text-gray-400 ml-auto">{task.count}具</span>
+            </div>
+
+            {/* Price Display */}
+            <div className="mb-3 bg-gray-50 rounded-xl px-3 py-2">
+              {task.confirmedPrice ? (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">订单总金额</span>
+                  <span className="text-sm font-bold text-green-600">¥{task.confirmedPrice.toLocaleString()}</span>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500">订单预估价格</span>
+                  <span className="text-sm font-bold text-blue-600">¥{task.estimatedPrice.toLocaleString()}</span>
+                </div>
+              )}
             </div>
 
             {task.status === "进行中" && (
@@ -302,10 +288,10 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                   联系
                 </button>
                 <button
-                  onClick={() => setShowPriceForm(true)}
+                  onClick={() => setShowProductForm(true)}
                   className="flex-1 bg-blue-600 text-white py-2 rounded-xl text-xs font-medium"
                 >
-                  提交报价
+                  提交清单
                 </button>
                 <button className="flex-1 flex items-center justify-center gap-1 border border-orange-200 text-orange-500 py-2 rounded-xl text-xs font-medium">
                   <AlertTriangle size={14} />
