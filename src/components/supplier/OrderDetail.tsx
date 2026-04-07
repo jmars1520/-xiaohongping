@@ -3,6 +3,7 @@ import { ArrowLeft, Phone, MapPin, Clock, CheckCircle2, Loader2 } from "lucide-r
 
 interface OrderDetailProps {
   onBack: () => void;
+  initialStatus?: string;
 }
 
 const orderData = {
@@ -13,10 +14,11 @@ const orderData = {
   status: "平台估价中" as "平台估价中" | "待用户确认" | "已完成",
 };
 
-export default function OrderDetail({ onBack }: OrderDetailProps) {
+export default function OrderDetail({ onBack, initialStatus }: OrderDetailProps) {
+  const effectiveInitial = initialStatus === "待用户确认" ? "待用户确认" : initialStatus === "已完成" ? "已完成" : "平台估价中";
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState(orderData.status);
+  const [currentStatus, setCurrentStatus] = useState<"平台估价中" | "待用户确认" | "已完成">(effectiveInitial);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">

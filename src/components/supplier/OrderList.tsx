@@ -3,7 +3,7 @@ import StatusBadge from "../shared/StatusBadge";
 
 interface OrderListProps {
   onBack: () => void;
-  onViewDetail: () => void;
+  onViewDetail: (status: string) => void;
 }
 
 const mockOrders = [
@@ -56,7 +56,7 @@ export default function OrderList({ onBack, onViewDetail }: OrderListProps) {
         {mockOrders.map((order) => (
           <button
             key={order.id}
-            onClick={onViewDetail}
+            onClick={() => onViewDetail(order.status)}
             className="w-full bg-white rounded-2xl p-4 shadow-sm text-left"
           >
             <div className="flex items-start justify-between mb-2">

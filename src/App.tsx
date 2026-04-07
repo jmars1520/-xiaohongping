@@ -26,6 +26,7 @@ type Role = "supplier" | "collector";
 function App() {
   const [role, setRole] = useState<Role>("supplier");
   const [page, setPage] = useState("home");
+  const [selectedOrderStatus, setSelectedOrderStatus] = useState<string>("平台估价中");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -72,9 +73,9 @@ function App() {
       case "createOrder":
         return <OrderCreate onBack={() => navigate("home")} onRequireLogin={requireLogin} />;
       case "orders":
-        return <OrderList onBack={() => navigate("home")} onViewDetail={() => navigate("orderDetail")} />;
+        return <OrderList onBack={() => navigate("home")} onViewDetail={(status: string) => { setSelectedOrderStatus(status); navigate("orderDetail"); }} />;
       case "orderDetail":
-        return <OrderDetail onBack={() => navigate("orders")} />;
+        return <OrderDetail onBack={() => navigate("orders")} initialStatus={selectedOrderStatus} />;
       case "recycle":
         return <RecycleCenter />;
       case "mine":
