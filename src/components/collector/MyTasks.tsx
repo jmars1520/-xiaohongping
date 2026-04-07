@@ -9,6 +9,7 @@ interface MyTasksProps {
 interface ProductItem {
   id: number;
   type: string;
+  brand: string;
   form: string;
   weight: string;
   condition: string;
@@ -30,9 +31,9 @@ export default function MyTasks({ onBack }: MyTasksProps) {
   const [activeTab, setActiveTab] = useState("进行中");
   const [showProductForm, setShowProductForm] = useState(false);
   const [productItems, setProductItems] = useState<ProductItem[]>([
-    { id: 1, type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "过期", qty: 50 },
-    { id: 2, type: "干粉灭火器", form: "推车式", weight: "35kg", condition: "完好", qty: 10 },
-    { id: 3, type: "CO₂灭火器", form: "手提式", weight: "3kg", condition: "过期", qty: 40 },
+    { id: 1, type: "干粉灭火器", brand: "", form: "手提式", weight: "4kg", condition: "过期", qty: 50 },
+    { id: 2, type: "干粉灭火器", brand: "", form: "推车式", weight: "35kg", condition: "完好", qty: 10 },
+    { id: 3, type: "CO₂灭火器", brand: "", form: "手提式", weight: "3kg", condition: "过期", qty: 40 },
   ]);
   const [submitted, setSubmitted] = useState(false);
   const [productRemark, setProductRemark] = useState("");
@@ -43,7 +44,7 @@ export default function MyTasks({ onBack }: MyTasksProps) {
   const addProductItem = () => {
     setProductItems([
       ...productItems,
-      { id: Date.now(), type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "完好", qty: 1 },
+      { id: Date.now(), type: "干粉灭火器", brand: "", form: "手提式", weight: "4kg", condition: "完好", qty: 1 },
     ]);
   };
 
@@ -58,7 +59,8 @@ export default function MyTasks({ onBack }: MyTasksProps) {
   };
 
   const totalQty = productItems.reduce((sum, item) => sum + item.qty, 0);
-  const estimatedPrice = totalQty * 5;
+  const estimatedPriceLow = totalQty * 3;
+  const estimatedPriceHigh = totalQty * 8;
 
   if (showProductForm) {
     return (
@@ -75,9 +77,9 @@ export default function MyTasks({ onBack }: MyTasksProps) {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-semibold text-blue-700">订单预估价格</div>
-              <div className="text-xs text-blue-500 mt-0.5">按4kg干粉灭火器 × 5元/具 估算</div>
+              <div className="text-xs text-blue-500 mt-0.5">根据商品规格估算</div>
             </div>
-            <div className="text-xl font-bold text-blue-600">¥{estimatedPrice.toLocaleString()}</div>
+            <div className="text-xl font-bold text-blue-600">¥{estimatedPriceLow.toLocaleString()} - ¥{estimatedPriceHigh.toLocaleString()}</div>
           </div>
           <div className="text-xs text-gray-400 mt-2">最终价格由后台客服确认后生效</div>
         </div>
@@ -109,6 +111,15 @@ export default function MyTasks({ onBack }: MyTasksProps) {
                     </select>
                     <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">品牌</label>
+                  <input
+                    value={item.brand}
+                    onChange={(e) => updateProductItem(item.id, "brand", e.target.value)}
+                    placeholder="请输入品牌"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  />
                 </div>
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">形式</label>
@@ -179,8 +190,8 @@ export default function MyTasks({ onBack }: MyTasksProps) {
               <span className="font-bold text-gray-800">{totalQty} 具</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">订单预估价格</span>
-              <span className="text-lg font-bold text-blue-600">¥{estimatedPrice.toLocaleString()}</span>
+              <span className="text-gray-600">整体成交总价</span>
+              <span className="text-lg font-bold text-blue-600">¥{estimatedPriceLow.toLocaleString()} - ¥{estimatedPriceHigh.toLocaleString()}</span>
             </div>
             <div className="text-xs text-gray-400">最终价格由后台客服定价确认</div>
           </div>

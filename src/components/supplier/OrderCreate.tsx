@@ -9,6 +9,7 @@ interface OrderCreateProps {
 interface SpecItem {
   id: number;
   type: string;
+  brand: string;
   form: string;
   weight: string;
   condition: string;
@@ -47,7 +48,7 @@ export default function OrderCreate({ onBack, onRequireLogin }: OrderCreateProps
   const [mode, setMode] = useState<"simple" | "detailed">("simple");
   const [simpleCount, setSimpleCount] = useState<string>("");
   const [specItems, setSpecItems] = useState<SpecItem[]>([
-    { id: 1, type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "过期", quantity: 30 },
+    { id: 1, type: "干粉灭火器", brand: "", form: "手提式", weight: "4kg", condition: "过期", quantity: 30 },
   ]);
   const [showSmallOrderWarning, setShowSmallOrderWarning] = useState(false);
   const [province, setProvince] = useState("北京市");
@@ -67,7 +68,7 @@ export default function OrderCreate({ onBack, onRequireLogin }: OrderCreateProps
   const addSpec = () => {
     setSpecItems([
       ...specItems,
-      { id: Date.now(), type: "干粉灭火器", form: "手提式", weight: "4kg", condition: "完好", quantity: 1 },
+      { id: Date.now(), type: "干粉灭火器", brand: "", form: "手提式", weight: "4kg", condition: "完好", quantity: 1 },
     ]);
   };
 
@@ -198,6 +199,15 @@ export default function OrderCreate({ onBack, onRequireLogin }: OrderCreateProps
                     </select>
                     <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">品牌</label>
+                  <input
+                    value={item.brand}
+                    onChange={(e) => updateSpec(item.id, "brand", e.target.value)}
+                    placeholder="请输入品牌"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
+                  />
                 </div>
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">形式</label>
