@@ -1,13 +1,9 @@
-import { Flame, ChevronRight, Recycle, TrendingUp, Truck, ShieldCheck } from "lucide-react";
+import { Flame, ChevronRight, Recycle, TrendingUp, Truck, Play } from "lucide-react";
 
 interface SupplierHomeProps {
   onNavigate: (page: string) => void;
 }
 
-const mockOrders = [
-  { id: "HY20260401001", status: "进行中", count: 120, date: "2026-04-02" },
-  { id: "HY20260330002", status: "待确认价格", count: 85, date: "2026-03-30" },
-];
 
 export default function SupplierHome({ onNavigate }: SupplierHomeProps) {
   return (
@@ -87,62 +83,27 @@ export default function SupplierHome({ onNavigate }: SupplierHomeProps) {
         </div>
       </div>
 
-      {/* Recent Orders */}
-      <div className="mx-4 mt-4">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold text-gray-700">近期订单</span>
-          <button onClick={() => onNavigate("orders")} className="text-xs text-red-500 flex items-center gap-0.5">
-            查看全部 <ChevronRight size={14} />
-          </button>
-        </div>
-        <div className="space-y-3">
-          {mockOrders.map((order) => (
-            <button
-              key={order.id}
-              onClick={() => onNavigate("orderDetail")}
-              className="w-full bg-white rounded-xl p-4 shadow-sm text-left flex items-center justify-between"
-            >
-              <div>
-                <div className="text-sm font-medium text-gray-800">{order.id}</div>
-                <div className="text-xs text-gray-400 mt-1">{order.date} · {order.count}具</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                  order.status === "进行中"
-                    ? "bg-blue-100 text-blue-600"
-                    : "bg-orange-100 text-orange-600"
-                }`}>
-                  {order.status}
-                </span>
-                <ChevronRight size={16} className="text-gray-300" />
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Features */}
+      {/* Promo Video */}
       <div className="mx-4 mt-4 mb-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-xl p-4 shadow-sm flex items-start gap-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
-              <ShieldCheck size={20} className="text-blue-500" />
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-semibold text-gray-700">回收业务介绍</span>
+          <span className="text-xs text-gray-400">了解更多</span>
+        </div>
+        <div className="bg-gray-900 rounded-2xl overflow-hidden shadow-sm aspect-video relative">
+          {/* Video Placeholder */}
+          <div className="absolute inset-0 bg-gradient-to-br from-red-600/80 to-orange-500/80 flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center mb-3 border-2 border-white/40">
+              <Play size={28} className="text-white ml-1" fill="white" />
             </div>
-            <div>
-              <div className="text-sm font-medium text-gray-700">合规处理</div>
-              <div className="text-xs text-gray-400 mt-0.5">全程可追溯</div>
-            </div>
+            <div className="text-white font-bold text-base">小红瓶再生 · 回收业务宣传</div>
+            <div className="text-white/70 text-xs mt-1">点击播放视频 · 02:30</div>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm flex items-start gap-3">
-            <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center shrink-0">
-              <Recycle size={20} className="text-green-500" />
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-700">环保回收</div>
-              <div className="text-xs text-gray-400 mt-0.5">绿色再生</div>
-            </div>
+          {/* Video Progress Bar Placeholder */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+            <div className="h-full w-0 bg-white rounded-full" />
           </div>
         </div>
+        <div className="mt-2 text-xs text-gray-400 text-center">了解灭火器合规回收全流程</div>
       </div>
     </div>
   );
