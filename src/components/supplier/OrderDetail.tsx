@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Phone, MapPin, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Phone, MapPin, Clock, CheckCircle2, Loader2 } from "lucide-react";
 
 interface OrderDetailProps {
   onBack: () => void;
@@ -7,15 +7,16 @@ interface OrderDetailProps {
 
 const orderData = {
   totalQty: 120,
-  estimatedPrice: 600, // 120具 × 5元/具
+  estimatedPriceLow: 360, // 120具 × 3元/具
+  estimatedPriceHigh: 960, // 120具 × 8元/具
   confirmedPrice: 880, // 后台确认后的价格
-  isPriceConfirmed: false, // 后台是否已确认价格
+  status: "平台估价中" as "平台估价中" | "待用户确认" | "已完成",
 };
 
 export default function OrderDetail({ onBack }: OrderDetailProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
-  const isPriceConfirmed = confirmed || orderData.isPriceConfirmed;
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(orderData.status);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -28,24 +29,34 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
       </div>
 
       {/* Status Banner */}
-      {isPriceConfirmed ? (
+      {currentStatus === "已完成" ? (
         <div className="mx-4 mt-4 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3">
           <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
             <CheckCircle2 size={20} className="text-green-500" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-green-700">价格已确认</div>
-            <div className="text-xs text-green-500 mt-0.5">后台已确认订单价格，货款已支付</div>
+            <div className="text-sm font-semibold text-green-700">已确认完成</div>
+            <div className="text-xs text-green-500 mt-0.5">货款已支付至您的钱包</div>
+          </div>
+        </div>
+      ) : currentStatus === "待用户确认" ? (
+        <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+            <Clock size={20} className="text-red-500" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-red-700">待用户确认</div>
+            <div className="text-xs text-red-500 mt-0.5">后台已完成估价，请确认订单金额</div>
           </div>
         </div>
       ) : (
         <div className="mx-4 mt-4 bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
-            <Clock size={20} className="text-orange-500" />
+            <Loader2 size={20} className="text-orange-500" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-orange-700">待客服定价</div>
-            <div className="text-xs text-orange-500 mt-0.5">集货商已提交完整清单，等待后台客服定价</div>
+            <div className="text-sm font-semibold text-orange-700">平台估价中</div>
+            <div className="text-xs text-orange-500 mt-0.5">集货商已提交完整清单，后台客服正在定价</div>
           </div>
         </div>
       )}
@@ -88,16 +99,22 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
             <span className="text-sm text-gray-500">总数量</span>
             <span className="text-sm font-bold text-gray-800">{orderData.totalQty} 具</span>
           </div>
-          {isPriceConfirmed ? (
+          {currentStatus === "已完成" ? (
             <div className="bg-green-50 rounded-xl p-4">
-              <div className="text-xs text-green-600 mb-1">订单总金额（后台已确认）</div>
+              <div className="text-xs text-green-600 mb-1">订单总金额</div>
               <div className="text-2xl font-bold text-green-600">¥{orderData.confirmedPrice.toLocaleString()}</div>
+            </div>
+          ) : currentStatus === "待用户确认" ? (
+            <div className="bg-red-50 rounded-xl p-4">
+              <div className="text-xs text-red-600 mb-1">订单总金额（后台已确认）</div>
+              <div className="text-2xl font-bold text-red-500">¥{orderData.confirmedPrice.toLocaleString()}</div>
+              <div className="text-xs text-gray-400 mt-1">请确认订单金额，确认后货款将支付至您的钱包</div>
             </div>
           ) : (
             <div className="bg-orange-50 rounded-xl p-4">
               <div className="text-xs text-orange-600 mb-1">订单预估价格</div>
-              <div className="text-2xl font-bold text-orange-500">¥{orderData.estimatedPrice.toLocaleString()}</div>
-              <div className="text-xs text-gray-400 mt-1">按4kg干粉灭火器 × {orderData.totalQty}具 × 5元/具 估算，最终价格以后台确认为准</div>
+              <div className="text-2xl font-bold text-orange-500">¥{orderData.estimatedPriceLow.toLocaleString()} - ¥{orderData.estimatedPriceHigh.toLocaleString()}</div>
+              <div className="text-xs text-gray-400 mt-1">最终价格以后台客服确认为准</div>
             </div>
           )}
         </div>
@@ -123,23 +140,29 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
       </div>
 
       {/* Action Buttons */}
-      {isPriceConfirmed && !confirmed && (
+      {currentStatus === "待用户确认" && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 flex gap-3">
-          <button className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-medium text-sm">
-            申请客服介入
+          <button
+            onClick={() => setShowCancelModal(true)}
+            className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-medium text-sm"
+          >
+            取消订单
           </button>
           <button
             onClick={() => setShowConfirmModal(true)}
             className="flex-1 bg-red-500 text-white py-3 rounded-xl font-medium text-sm"
           >
-            同意并确认
+            确认订单
           </button>
         </div>
       )}
 
-      {!isPriceConfirmed && (
+      {currentStatus === "平台估价中" && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4">
-          <button className="w-full border border-gray-300 text-gray-600 py-3 rounded-xl font-medium text-sm">
+          <button
+            onClick={() => setShowCancelModal(true)}
+            className="w-full border border-gray-300 text-gray-600 py-3 rounded-xl font-medium text-sm"
+          >
             取消订单
           </button>
         </div>
@@ -150,7 +173,7 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-8">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
             <h3 className="font-bold text-gray-800 text-center mb-2">确认订单金额</h3>
-            <p className="text-sm text-gray-500 text-center mb-2">后台已确认订单价格，确认后平台将支付货款</p>
+            <p className="text-sm text-gray-500 text-center mb-2">确认后货款将支付至您的钱包</p>
             <div className="text-center text-3xl font-bold text-red-500 my-4">¥{orderData.confirmedPrice.toLocaleString()}</div>
             <div className="flex gap-3">
               <button
@@ -160,10 +183,34 @@ export default function OrderDetail({ onBack }: OrderDetailProps) {
                 取消
               </button>
               <button
-                onClick={() => { setShowConfirmModal(false); setConfirmed(true); }}
+                onClick={() => { setShowConfirmModal(false); setCurrentStatus("已完成"); }}
                 className="flex-1 bg-red-500 text-white py-2.5 rounded-xl text-sm font-medium"
               >
                 确认同意
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-8">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="font-bold text-gray-800 text-center mb-2">确认取消订单</h3>
+            <p className="text-sm text-gray-500 text-center mb-4">取消后订单将不可恢复，确认要取消吗？</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="flex-1 border border-gray-300 text-gray-600 py-2.5 rounded-xl text-sm font-medium"
+              >
+                再想想
+              </button>
+              <button
+                onClick={() => { setShowCancelModal(false); onBack(); }}
+                className="flex-1 bg-gray-500 text-white py-2.5 rounded-xl text-sm font-medium"
+              >
+                确认取消
               </button>
             </div>
           </div>

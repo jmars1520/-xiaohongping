@@ -8,9 +8,10 @@ interface OrderListProps {
 
 const mockOrders = [
   { id: "HY20260401001", status: "进行中", type: "精细发布", count: 120, total: "¥960", date: "2026-04-02", tags: ["多规格"] },
-  { id: "HY20260330002", status: "待确认价格", type: "简易发布", count: 85, total: "¥510", date: "2026-03-30", tags: [] },
+  { id: "HY20260330002", status: "平台估价中", type: "简易发布", count: 85, total: "¥255 - ¥680", date: "2026-03-30", tags: [] },
+  { id: "HY20260328006", status: "待用户确认", type: "精细发布", count: 60, total: "¥510", date: "2026-03-28", tags: ["多规格"] },
   { id: "HY20260325003", status: "已完成", type: "精细发布", count: 200, total: "¥1,600", date: "2026-03-25", tags: ["多规格"] },
-  { id: "HY20260320004", status: "待接单", type: "简易发布", count: 30, total: "¥180", date: "2026-03-20", tags: ["小单"] },
+  { id: "HY20260320004", status: "待接单", type: "简易发布", count: 30, total: "¥90 - ¥240", date: "2026-03-20", tags: ["小单"] },
   { id: "HY20260315005", status: "已完成", type: "简易发布", count: 150, total: "¥1,200", date: "2026-03-15", tags: [] },
 ];
 
@@ -38,7 +39,7 @@ export default function OrderList({ onBack, onViewDetail }: OrderListProps) {
 
       {/* Filter Tabs */}
       <div className="px-4 pt-4 flex gap-2 overflow-x-auto">
-        {["全部", "待接单", "进行中", "待确认价格", "已完成"].map((tab, i) => (
+        {["全部", "待接单", "进行中", "平台估价中", "待用户确认", "已完成"].map((tab, i) => (
           <button
             key={tab}
             className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition ${
